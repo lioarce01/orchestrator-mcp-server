@@ -4,24 +4,17 @@
   "description": "MCP Orchestrator Server - Coordinates tasks between multiple MCP services",
   "main": "dist/index.js",
   "type": "module",
+  "keywords": ["mcp", "docker", "orchestrator", "coordination", "ai", "anthropic"],
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "tsx src/index.ts",
     "watch": "tsx watch src/index.ts"
   },
-  "keywords": [
-    "mcp",
-    "orchestrator",
-    "coordination",
-    "trello",
-    "github"
-  ],
   "author": "Lionel Arce",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^0.4.0",
-    "axios": "^1.9.0"
+    "@modelcontextprotocol/sdk": "^0.4.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

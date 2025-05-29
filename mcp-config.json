@@ -1,0 +1,30 @@
+{
+  "mcps": [
+    {
+      "name": "github-mcp",
+      "capabilities": ["github", "repository", "branch", "commit", "pull-request"],
+      "container": {
+        "name": "github-mcp-container",
+        "command": ["node", "index.js"],
+        "workdir": "/app"
+      },
+      "healthCheck": {
+        "interval": 30000,
+        "timeout": 10000
+      }
+    },
+    {
+      "name": "trello-mcp",
+      "capabilities": ["trello", "board", "card", "list", "kanban"],
+      "container": {
+        "name": "trello-mcp-container",
+        "command": ["node", "server.js"],
+        "workdir": "/app"
+      },
+      "healthCheck": {
+        "interval": 30000,
+        "timeout": 10000
+      }
+    }
+  ]
+}
