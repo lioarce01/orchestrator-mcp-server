@@ -1,21 +1,34 @@
 {
   "name": "mcp-orchestrator",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "MCP Orchestrator Server - Coordinates tasks between multiple MCP services",
+  "main": "dist/index.js",
+  "type": "module",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "watch": "tsx watch src/index.ts"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "mcp",
+    "orchestrator",
+    "coordination",
+    "trello",
+    "github"
+  ],
+  "author": "Lionel Arce",
+  "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.12.0",
-    "zod": "^3.25.32"
+    "@modelcontextprotocol/sdk": "^0.4.0",
+    "axios": "^1.9.0"
   },
   "devDependencies": {
-    "@types/node": "^22.15.24",
-    "typescript": "^5.8.3"
+    "@types/node": "^20.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
