@@ -11,6 +11,9 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: ^0.4.0
         version: 0.4.0
+      zod:
+        specifier: ^3.25.42
+        version: 3.25.42
     devDependencies:
       '@types/node':
         specifier: ^20.0.0
@@ -254,8 +257,8 @@ packages:
     resolution: {integrity: sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==}
     engines: {node: '>= 0.8'}
 
-  zod@3.25.32:
-    resolution: {integrity: sha512-OSm2xTIRfW8CV5/QKgngwmQW/8aPfGdaQFlrGoErlgg/Epm7cjb6K6VEyExfe65a3VybUOnu381edLb0dfJl0g==}
+  zod@3.25.42:
+    resolution: {integrity: sha512-PcALTLskaucbeHc41tU/xfjfhcz8z0GdhhDcSgrCTmSazUuqnYqiXO63M0QUBVwpBlsLsNVn5qHSC5Dw3KZvaQ==}
 
 snapshots:
 
@@ -338,7 +341,7 @@ snapshots:
     dependencies:
       content-type: 1.0.5
       raw-body: 3.0.0
-      zod: 3.25.32
+      zod: 3.25.42
 
   '@types/node@20.17.52':
     dependencies:
@@ -429,4 +432,4 @@ snapshots:
 
   unpipe@1.0.0: {}
 
-  zod@3.25.32: {}
+  zod@3.25.42: {}

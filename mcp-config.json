@@ -1,11 +1,11 @@
 {
   "mcps": [
     {
-      "name": "github-mcp",
+      "name": "github-mcp-server",
       "capabilities": ["github", "repository", "branch", "commit", "pull-request"],
       "container": {
-        "name": "github-mcp-container",
-        "command": ["node", "index.js"],
+        "name": "github-mcp-server",
+        "command": ["node", "dist/index.js"],
         "workdir": "/app"
       },
       "healthCheck": {
@@ -14,11 +14,11 @@
       }
     },
     {
-      "name": "trello-mcp",
+      "name": "trello-mcp-server",
       "capabilities": ["trello", "board", "card", "list", "kanban"],
       "container": {
-        "name": "trello-mcp-container",
-        "command": ["node", "server.js"],
+        "name": "trello-mcp-server",
+        "command": ["node", "dist/index.js"],
         "workdir": "/app"
       },
       "healthCheck": {

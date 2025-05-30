@@ -6,13 +6,13 @@ import { connectToMCP, sendMCPRequest } from "../mcpClient/mcp_client";
 import { setupProcessHandlers } from "../handlers/process_handler";
 import { analyzeTask, generateSmartParams } from "../tasks/tasks";
 import { registerTools, selectBestTools } from "../tools/tools";
+import { initializeHandshake } from "../handlers/MCPHandlers";
 
 export class DockerMCPOrchestrator {
   private server: Server;
   private mcpClients = new Map<string, MCPClient>();
   private configs: MCPConfig[];
   private healthInterval: NodeJS.Timeout | null = null;
-
   constructor(configPath?: string) {
     this.configs = loadConfig(configPath);
     this.server = new Server({
@@ -20,21 +20,39 @@ export class DockerMCPOrchestrator {
       version: "1.0.0",
     });
     registerTools(this.server);
+    initializeHandshake(this.server);
   }
 
   public getMCPClient(name: string) {
     return this.mcpClients.get(name);
   }
-
   async initialize(): Promise<void> {
     console.error("Initializing Docker MCP Orchestrator...");
     for (const cfg of this.configs) {
       try {
         const client = await connectToMCP(cfg);
         setupProcessHandlers(client, this.handleResponse.bind(this));
-        await this.waitForReady(client);
-        this.mcpClients.set(cfg.name, client);
-        console.error(`Connected to MCP: ${cfg.name}`);
+        // await this.waitForReady(client);
+
+        // Perform MCP handshake
+        const initResult = await sendMCPRequest(client, "initialize", {
+          protocolVersion: "2024-11-05",
+          capabilities: { tools: {} },
+          clientInfo: {
+            name: "docker-mcp-orchestrator",
+            version: "1.0.0",
+          },
+        });
+
+        if (initResult) {
+          // Send initialized notification after successful initialize
+          await sendMCPRequest(client, "initialized", {});
+          client.isReady = true;
+          this.mcpClients.set(cfg.name, client);
+          console.error(`Connected to MCP: ${cfg.name}`);
+        } else {
+          throw new Error("Initialize request failed");
+        }
       } catch (err) {
         console.error(`Failed to connect ${cfg.name}:`, err);
       }
@@ -52,21 +70,48 @@ export class DockerMCPOrchestrator {
     if (error) pending.reject(new Error(error.message));
     else pending.resolve(result);
   }
-
   private waitForReady(client: MCPClient, timeout = 10000): Promise<void> {
     return new Promise((res, rej) => {
       const timer = setTimeout(
         () => rej(new Error("Timeout waiting for MCP")),
         timeout
       );
+
+      // Check initial buffer for ready message
+      if (client.messageBuffer.includes("MCP Server connected and ready")) {
+        clearTimeout(timer);
+        res();
+        return;
+      }
+
+      // If not found in buffer, wait for it
       const onData = (data: Buffer) => {
-        if (data.toString().includes('"jsonrpc"')) {
+        const message = data.toString();
+        if (message.includes("MCP Server connected and ready")) {
+          clearTimeout(timer);
+          client.process?.stdout?.off("data", onData);
+          res();
+        }
+
+        if (message.includes("ready") || message.includes('"jsonrpc"')) {
           clearTimeout(timer);
           client.process?.stdout?.off("data", onData);
           res();
         }
       };
+
       client.process?.stdout?.on("data", onData);
+
+      // Also handle case where process fails
+      client.process?.on("error", (err) => {
+        clearTimeout(timer);
+        rej(err);
+      });
+
+      client.process?.on("exit", (code) => {
+        clearTimeout(timer);
+        rej(new Error(`Process exited with code ${code}`));
+      });
     });
   }
 
@@ -234,7 +279,9 @@ export class DockerMCPOrchestrator {
         results.push({ name, status: "unhealthy", error: err.message });
       }
     }
-    return { results };
+    return {
+      content: [],
+    };
   }
 
   async executeTask(

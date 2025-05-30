@@ -1,9 +1,12 @@
 import { readFileSync } from "fs";
 import { MCPConfig } from "../types/mcp";
-import { resolve } from "path";
+import { resolve, dirname } from "path";
+import { fileURLToPath } from "url";
 
-export function loadConfig(path = "./mcp-config.json"): MCPConfig[] {
-  const absPath = resolve(process.cwd(), path);
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+export function loadConfig(path = "../../mcp-config.json"): MCPConfig[] {
+  const absPath = resolve(__dirname, path);
   const data = readFileSync(absPath, "utf8");
   const { mcps } = JSON.parse(data);
   return mcps;
