@@ -67,27 +67,27 @@ class DockerMCPOrchestrator {
   private async initialize(): Promise<void> {
     await this.initializeMCPs();
     this.startHealthChecks();
-    console.error("🚀 Docker MCP Orchestrator initialized");
+    console.error("Docker MCP Orchestrator initialized");
   }
 
   // === MCP Connection Management ===
   private async initializeMCPs(): Promise<void> {
-    console.error("🔌 Connecting to dockerized MCPs...");
+    console.error("Connecting to dockerized MCPs...");
 
     const initPromises = this.config.mcps.map(async (mcpConfig) => {
       try {
         await this.connectToDockerMCP(mcpConfig);
-        console.error(`✅ ${mcpConfig.name} connected`);
+        console.error(`${mcpConfig.name} connected`);
         this.reconnectAttempts.set(mcpConfig.name, 0);
       } catch (error) {
-        console.error(`❌ Failed to connect ${mcpConfig.name}:`, error);
+        console.error(`Failed to connect ${mcpConfig.name}:`, error);
         this.reconnectAttempts.set(mcpConfig.name, 1);
       }
     });
 
     await Promise.allSettled(initPromises);
     console.error(
-      `🎯 ${this.mcpClients.size}/${this.config.mcps.length} MCPs connected`
+      `${this.mcpClients.size}/${this.config.mcps.length} MCPs connected`
     );
   }
 
@@ -163,15 +163,13 @@ class DockerMCPOrchestrator {
     });
 
     client.process.on("error", (error) => {
-      console.error(`❌ Process error for ${client.config.name}:`, error);
+      console.error(`Process error for ${client.config.name}:`, error);
       client.isReady = false;
       this.scheduleReconnect(client);
     });
 
     client.process.on("exit", (code) => {
-      console.error(
-        `⚠️ Process exited for ${client.config.name} (code: ${code})`
-      );
+      console.error(`Process exited for ${client.config.name} (code: ${code})`);
       client.isReady = false;
       client.process = null;
       this.scheduleReconnect(client);
@@ -280,7 +278,7 @@ class DockerMCPOrchestrator {
     });
   }
 
-  // === Health Check System ===
+  // Health Check System
   private startHealthChecks(): void {
     this.healthCheckInterval = setInterval(async () => {
       const healthPromises = Array.from(this.mcpClients.entries()).map(
@@ -290,7 +288,7 @@ class DockerMCPOrchestrator {
             await this.sendMCPRequest(client, "ping", {});
             client.lastHealthCheck = Date.now();
           } catch (error) {
-            console.error(`❌ Health check failed for ${name}`);
+            console.error(`Health check failed for ${name}`);
             client.isReady = false;
             this.scheduleReconnect(client);
           }
@@ -308,9 +306,7 @@ class DockerMCPOrchestrator {
 
     const attempts = this.reconnectAttempts.get(client.config.name) || 0;
     if (attempts >= this.maxReconnectAttempts) {
-      console.error(
-        `❌ Max reconnect attempts reached for ${client.config.name}`
-      );
+      console.error(`Max reconnect attempts reached for ${client.config.name}`);
       return;
     }
 
@@ -322,17 +318,17 @@ class DockerMCPOrchestrator {
     setTimeout(async () => {
       try {
         await this.connectToDockerMCP(client.config);
-        console.error(`✅ ${client.config.name} reconnected`);
+        console.error(`${client.config.name} reconnected`);
         this.reconnectAttempts.set(client.config.name, 0);
       } catch (error) {
-        console.error(`❌ Reconnection failed for ${client.config.name}`);
+        console.error(`Reconnection failed for ${client.config.name}`);
         this.reconnectAttempts.set(client.config.name, attempts + 1);
         this.scheduleReconnect(client);
       }
     }, delay);
   }
 
-  // === Task Analysis and Execution ===
+  // Task Analysis and Execution
   private analyzeTask(task: string): string[] {
     const taskLower = task.toLowerCase();
     const requiredMCPs: string[] = [];
@@ -361,9 +357,9 @@ class DockerMCPOrchestrator {
           "pull request",
         ],
         trello: ["trello", "board", "card", "list", "kanban"],
-        database: ["database", "db", "sql", "query"],
-        email: ["email", "mail", "send", "notification"],
-        file: ["file", "document", "upload", "download"],
+        // database: ["database", "db", "sql", "query"],
+        // email: ["email", "mail", "send", "notification"],
+        // file: ["file", "document", "upload", "download"],
       };
 
       for (const [service, serviceKeywords] of Object.entries(keywords)) {
@@ -629,7 +625,7 @@ class DockerMCPOrchestrator {
     const { task, parallel = true } = args;
     const startTime = Date.now();
 
-    console.error(`🎯 Orchestrating task: ${task}`);
+    console.error(`Orchestrating task: ${task}`);
 
     // 1. Analyze task requirements
     const requiredMCPs = this.analyzeTask(task);
@@ -825,11 +821,11 @@ class DockerMCPOrchestrator {
     };
   }
 
-  // === Public API ===
+  // Public API
   async start(): Promise<void> {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.error("🎉 Docker MCP Orchestrator started");
+    console.error("Docker MCP Orchestrator started");
   }
 
   async stop(): Promise<void> {
@@ -843,7 +839,7 @@ class DockerMCPOrchestrator {
       }
     }
 
-    console.error("🛑 Docker MCP Orchestrator stopped");
+    console.error("Docker MCP Orchestrator stopped");
   }
 }
 
